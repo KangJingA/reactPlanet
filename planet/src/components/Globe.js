@@ -1,6 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+import bumpImage from "./images/elev_bump_4k.jpg";
+import cloudImage from "./images/fair_clouds_4k.png";
+import galaxyImage from "./images/galaxy_starfield.png";
+import earthImage from "./images/no_clouds_8k.jpg";
+import waterImage from "./images/water_4k.png";
+
 
 function Marker() {
     THREE.Object3D.call(this);
@@ -25,14 +31,27 @@ Marker.prototype = Object.create(THREE.Object3D.prototype);
 
 // ------ Earth object -------------------------------------------------
 
-function Earth (radius, texture) {
+function Earth (radius, textureLoader) {
     THREE.Object3D.call(this);
-
+    
+    // update global radius
     this.userData.radius = radius;
 
-    var sphere = new THREE.SphereBufferGeometry(radius, 64.0, 48.0);
-    var material = new THREE.MeshPhongMaterial({ map: texture });
-    var earth = new THREE.Mesh(sphere, material);
+    // radius, width segments, height segments
+    var sphere = new THREE.SphereGeometry(radius, 64.0, 48.0);
+    
+    //var texture = loader.load('https://s3-eu-west-2.amazonaws.com/bckld/lab/textures/earth_latlon.jpg');
+    // texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+
+    var texture = new THREE.MeshPhongMaterial({
+        map:         textureLoader.load(earthImage),
+        bumpMap:     textureLoader.load(bumpImage),
+        bumpScale:   0.01,
+        specularMap: textureLoader.load(waterImage),
+        specular:    new THREE.Color('grey')								
+    });
+
+    var earth = new THREE.Mesh(sphere, texture);
 
     this.add(earth);
 };
@@ -52,26 +71,48 @@ Earth.prototype.createMarker = function (lat, lon) {
     this.add(marker);
 };
 
+function createClouds(radius, textureLoader) {
+    return new THREE.Mesh(
+        new THREE.SphereGeometry(radius + 0.003, 64.0, 48.0),
+        new THREE.MeshPhongMaterial({
+            map: textureLoader.load(cloudImage),
+            transparent: true
+        })
+    );		
+}
+function createGalaxy(radius, textureLoader) {
+    return new THREE.Mesh(
+        new THREE.SphereGeometry(radius, 90, 64), 
+        new THREE.MeshBasicMaterial({
+            map:  textureLoader.load(galaxyImage), 
+            side: THREE.BackSide
+        })
+    );
+}
 
 const Globe = () => {
     const globeRef = useRef(null);
 
     useEffect(() => {
     var scene = new THREE.Scene();
+    
+    // field of view, aspect ratio, near plane, far plane
     var camera = new THREE.PerspectiveCamera(
         75,
         globeRef.current.clientWidth / globeRef.current.clientHeight,
-        0.1,
+        0.01,
         1000
     );
     
+    camera.position.z = 2;
+
     var renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(globeRef.current.clientWidth,globeRef.current.clientHeight);
     document.body.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.autoRotate = true;
-    controls.autoRotateSpeed = -1.0;
+    controls.autoRotateSpeed = 0.2;
     controls.enablePan = false;
     
     var ambient = new THREE.AmbientLight(0xffffff, 0.5);
@@ -87,22 +128,25 @@ const Globe = () => {
         renderer.render(scene, camera);
     }
 
-    camera.position.z = 2;
-
-    var loader = new THREE.TextureLoader();
-    loader.load('https://s3-eu-west-2.amazonaws.com/bckld/lab/textures/earth_latlon.jpg', (texture) => {
-        texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-        var earth = new Earth(1.0, texture);
-        scene.add(earth);
-        earth.createMarker(48.856700, 2.350800); // Paris
-        earth.createMarker(51.507222, -0.1275); // London
-        earth.createMarker(34.050000, -118.250000); // LA
-        earth.createMarker(41.836944, -87.684722); // Chicago
-        earth.createMarker(35.683333, 139.683333); // Tokyo
-        earth.createMarker(33.333333, 44.383333); // Baghdad
-        earth.createMarker(40.712700, -74.005900); // New York
-    });
     
+    // create objects 
+    var loader = new THREE.TextureLoader();
+    
+    var earth = new Earth(1.0, loader);
+    scene.add(earth);
+    // earth.createMarker(48.856700, 2.350800); // Paris
+    earth.createMarker(51.507222, -0.1275); // London
+    // earth.createMarker(34.050000, -118.250000); // LA
+    // earth.createMarker(41.836944, -87.684722); // Chicago
+    earth.createMarker(35.683333, 139.683333); // Tokyo
+    // earth.createMarker(33.333333, 44.383333); // Baghdad
+    // earth.createMarker(40.712700, -74.005900); // New York
+    
+
+    var clouds = createClouds(1.0,loader);
+    scene.add(clouds);
+    var galaxy = createGalaxy(90.0,loader);
+    scene.add(galaxy);
     animate();
 
     window.addEventListener('resize', onResize);
