@@ -1,11 +1,13 @@
 import React from 'react';
-import Globe from './Globe';
-
+//import Globe from './Globe';
+import Searchbar from './Searchbar';
+//import SpeciesNameConvertor from '../api/SpeciesNameConvertor'
 const App = () => {
 
     return (
         <div>
-            <Globe />
+            Hello
+            <Searchbar></Searchbar>
         </div>
     )
 }

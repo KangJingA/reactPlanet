@@ -115,11 +115,11 @@ const Globe = () => {
     controls.autoRotateSpeed = 0.2;
     controls.enablePan = false;
     
-    var ambient = new THREE.AmbientLight(0xffffff, 0.5);
+    var ambient = new THREE.AmbientLight(0x333333,4.5);
     scene.add(ambient);
-    var directional = new THREE.DirectionalLight(0xffffff, 0.5);
-    directional.position.set(5.0, 2.0, 5.0).normalize();
-    scene.add(directional);
+    // var directional = new THREE.DirectionalLight(0xffffff, 0.8); // colour, intensity 
+    // directional.position.set(5.0, 3.0, 5.0) //.normalize();
+    //scene.add(directional);
     
     var animate= () => {
 
@@ -128,8 +128,9 @@ const Globe = () => {
         renderer.render(scene, camera);
     }
 
-    
     // create objects 
+
+    // init texture loader
     var loader = new THREE.TextureLoader();
     
     var earth = new Earth(1.0, loader);
@@ -142,7 +143,6 @@ const Globe = () => {
     // earth.createMarker(33.333333, 44.383333); // Baghdad
     // earth.createMarker(40.712700, -74.005900); // New York
     
-
     var clouds = createClouds(1.0,loader);
     scene.add(clouds);
     var galaxy = createGalaxy(90.0,loader);
