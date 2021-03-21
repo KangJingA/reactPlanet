@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+
+// import downloaded textures 
 import bumpImage from "./images/elev_bump_4k.jpg";
 import cloudImage from "./images/fair_clouds_4k.png";
 import galaxyImage from "./images/galaxy_starfield.png";
@@ -15,7 +17,7 @@ function Marker() {
     var sphereRadius = 0.02;
     var height = 0.05;
 
-    var material = new THREE.MeshPhongMaterial({ color: 0xbab68f });
+    var material = new THREE.MeshPhongMaterial({ color: 0xbab68f }); // change colour to smth brighter
 
     var cone = new THREE.Mesh(new THREE.ConeBufferGeometry(radius, height, 8, 1, true), material);
     cone.position.y = height * 0.5;

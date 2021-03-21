@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import SpeciesNameConvertor from '../api/SpeciesNameConvertor';
 import Geocode from '../api/Geocode';
+import Redlist from '../api/Redlist';
 
 const removeDuplicatesBy = (keyFn, array) => {
     var mySet = new Set();
@@ -39,9 +40,9 @@ const Searchbar = () => {
             const response = await SpeciesNameConvertor(debouncedTerm);
             
             // get common species names 
-            //const uniqueCommonNames = removeDuplicatesBy(x =>x.tsn, commonNames);
-            
-            setResults(response);
+            const uniqueNames = removeDuplicatesBy(x =>x.species, response);
+            console.log(response);
+            setResults(uniqueNames);
         };
         
         if (debouncedTerm) {
@@ -52,13 +53,20 @@ const Searchbar = () => {
 
     // display common names 
     const renderedResults = results.map((result)=> {
-        return (
-            <div key={result.key} className="item">
-                <div className="right floated content">
-                    {result.species}
+
+
+        // return if its not null
+        if (result.species) {
+            
+            return (
+                <div key={result.key} className="item">
+                    <div className="right floated content">
+                        {result.species}
+                    </div>
                 </div>
-            </div>
-        )
+            )
+        }
+        
     })
     return (
         <div>
@@ -75,5 +83,10 @@ const Searchbar = () => {
         </div>
     )
 };
+
+Redlist.countryOccurence('Loxodonta africana').then((res) =>{
+    console.log(res);
+}
+)
 
 export default Searchbar;
