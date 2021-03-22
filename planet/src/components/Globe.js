@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+import $ from 'jquery';
 
 // import downloaded textures 
 import bumpImage from "./images/elev_bump_4k.jpg";
@@ -8,6 +9,8 @@ import cloudImage from "./images/fair_clouds_4k.png";
 import galaxyImage from "./images/galaxy_starfield.png";
 import earthImage from "./images/no_clouds_8k.jpg";
 import waterImage from "./images/water_4k.png";
+
+import './css/Globe.css'
 
 
 function Marker() {
@@ -110,7 +113,9 @@ const Globe = () => {
 
     var renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(globeRef.current.clientWidth,globeRef.current.clientHeight);
+    console.log(renderer.domElement);
     document.body.appendChild(renderer.domElement);
+
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.autoRotate = true;
@@ -165,8 +170,9 @@ const Globe = () => {
     
     return (
         <div
+        className="Globe"
         ref={globeRef}
-        style={{ width: "100%", height: "100%", margin: "0px" }}
+        // style={{ width: "100%", height: "100%", margin: "0px" }}
         >
       </div>
     );
